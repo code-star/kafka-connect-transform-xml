@@ -22,6 +22,7 @@ import com.github.jcustenborder.kafka.connect.utils.transformation.BaseKeyValueT
 import com.github.jcustenborder.kafka.connect.xml.Connectable;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.ConnectRecord;
+import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaAndValue;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.errors.DataException;
@@ -39,6 +40,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Title("FromXML")
 @Description("This transformation is used to read XML data stored as bytes or a string and convert " +
@@ -168,6 +170,22 @@ public abstract class FromXml<R extends ConnectRecord<R>> extends BaseKeyValueTr
 
     @Override
     public R apply(R r) {
+
+      if (!config.keyCondition.isEmpty()) {
+        if (r.keySchema().schema().type() != Schema.Type.STRING)
+          throw new DataException("keyCondition cannot be applied to non-string key");
+
+        if (Pattern.matches(config.keyCondition, r.key().toString())) {
+          return applyTransformation(r);
+        } else {
+          return r;
+        }
+      }
+
+      return applyTransformation(r);
+    }
+
+    private R applyTransformation(R r) {
       final SchemaAndValue transformed = process(r, new SchemaAndValue(r.valueSchema(), r.value()));
 
       return r.newRecord(

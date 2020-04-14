@@ -14,9 +14,10 @@ This transformation is used to rename fields in the key of an input struct based
 
 ### Configuration
 
-| Name         | Type   | Importance | Default Value | Validator | Documentation                                                   |
-| ------------ | ------ | ---------- | ------------- | --------- | --------------------------------------------------------------- |
-| schema.path  | List   | High       |               |           | Urls to the schemas to load. http and https paths are supported |
+| Name                | Type   | Importance | Default Value | Validator | Documentation                                                    |
+| ------------------- | ------ | ---------- | ------------- | --------- | ---------------------------------------------------------------- |
+| schema.path         | List   | High       |               |           | Urls to the schemas to load. http and https paths are supported  |
+| key.condition.regex | String | Low        |               |           | The transformation is applied only if the key matches this regex |
 
 
 #### Standalone Example
